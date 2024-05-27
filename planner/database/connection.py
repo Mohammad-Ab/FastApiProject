@@ -1,11 +1,12 @@
-from beanie import init_beanie
+from beanie import init_beanie,PydanticObjectId
 from motor.motor_asyncio import AsyncIOMotorClient
-from typing import Optional
-from pydantic import BaseSetting,BaseModel
+from typing import Optional,List,Any
+from pydantic import BaseModel
+from pydantic_settings import BaseSettings
 from models.users import User
 from models.events import Event
 
-class Settings(BaseSetting):
+class Settings(BaseSettings):
     DATABASE_URL: Optional[str] = None
     
     async def initialize_database(self):
@@ -40,20 +41,16 @@ class Database:
         return docs
 
     #update
-     async def update(self, id: PydanticObjectId, body: BaseModel) -> Any:
-        doc_id = id
-        des_body = body.dict()
-
-        des_body = {k: v for k, v in des_body.items() if v is not None}
-        update_query = {"$set": {
-            field: value for field, value in des_body.items()
-        }}
-
-        doc = await self.get(doc_id)
-        if not doc:
-            return False
-        await doc.update(update_query)
-        return doc
+    async def update(self, id: PydanticObjectId, body: BaseModel) -> Any:
+         doc_id = id
+         des_body = body.dict()
+         des_body = {k: v for k, v in des_body.items() if v is not None}
+         update_query = {"$set": {field: value for field, value in des_body.items()}}
+         doc = await self.get(doc_id)
+         if not doc:
+             return False
+         await doc.update(update_query)
+         return doc
     
     #delete
     async def delete(self, id: PydanticObjectId) -> bool:

@@ -38,7 +38,7 @@ async def sign_user_in(user: UserSignIn) -> dict:
         }
 
     raise HTTPException(
-        status_code = status.HTTP_401_UNAUTHORIZED
+        status_code = status.HTTP_401_UNAUTHORIZED,
         detail="Invalid details passed"
     )
 
